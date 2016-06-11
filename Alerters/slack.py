@@ -36,10 +36,6 @@ class SlackAlerter(Alerter):
     def send_alert(self, name, monitor):
         """Send the message."""
 
-        firstFailureTime = monitor.first_failure_time()
-        localized_firstFailureTime = pytz.utc.localize(firstFailureTime)
-        ist_converted_time = self.format_datetime(localized_firstFailureTime.astimezone(timezone('Asia/Kolkata')))
-
         type = self.should_alert(monitor)
         (days, hours, minutes, seconds) = self.get_downtime(monitor)
 
@@ -55,11 +51,15 @@ class SlackAlerter(Alerter):
         if type == "":
             return
         elif type == "failure":
+            firstFailureTime = monitor.first_failure_time()
+            localized_firstFailureTime = pytz.utc.localize(firstFailureTime)
+            ist_converted_time = self.format_datetime(localized_firstFailureTime.astimezone(timezone('Asia/Kolkata')))
+
             message_json['text'] = "API test run completed."
 
             message_json['username'] = "V18SimpleMonitor"
             message_json["icon_url"] = "http://i.imgur.com/XdABB5Z.png"
-            
+
             message_json['attachments'][0]['color'] = 'danger'
             message_json['attachments'][0]['title'] = "Monitor {} failed!".format(name)
             message_json['attachments'][0]['title_link'] = "https://rpm.newrelic.com/accounts/1259793/applications/16687249/transactions#id=5b225765625472616e73616374696f6e2f416374696f6e2f73657276696365732f696e6465782f6164756c742d736561726368222c22225d"
@@ -107,6 +107,10 @@ class SlackAlerter(Alerter):
             message_json['attachments'][0]['fields'] = fields
 
         elif type == "success":
+            firstFailureTime = monitor.first_failure_time()
+            localized_firstFailureTime = pytz.utc.localize(firstFailureTime)
+            ist_converted_time = self.format_datetime(localized_firstFailureTime.astimezone(timezone('Asia/Kolkata')))
+            
             message_json['text'] = "API test run completed."
 
             message_json['username'] = "V18SimpleMonitor"
