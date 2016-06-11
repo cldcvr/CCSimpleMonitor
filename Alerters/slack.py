@@ -55,8 +55,15 @@ class SlackAlerter(Alerter):
         if type == "":
             return
         elif type == "failure":
-            message_json['text'] = "Monitor {} failed!".format(name)
+            message_json['text'] = "API test run completed."
+
+            message_json['username'] = "V18SimpleMonitor"
+            message_json["icon_url"] = "http://i.imgur.com/XdABB5Z.png"
+            
             message_json['attachments'][0]['color'] = 'danger'
+            message_json['attachments'][0]['title'] = "Monitor {} failed!".format(name)
+            message_json['attachments'][0]['title_link'] = "https://rpm.newrelic.com/accounts/1259793/applications/16687249/transactions#id=5b225765625472616e73616374696f6e2f416374696f6e2f73657276696365732f696e6465782f6164756c742d736561726368222c22225d"
+
             fields = [
                 {
                     'title': 'Failed at',
@@ -100,7 +107,10 @@ class SlackAlerter(Alerter):
             message_json['attachments'][0]['fields'] = fields
 
         elif type == "success":
-            message_json['text'] = "Monitor {} succeeded.".format(name)
+            message_json['text'] = "API test run completed."
+
+            message_json['username'] = "V18SimpleMonitor"
+            message_json["icon_url"] = "http://i.imgur.com/XdABB5Z.png"
             fields = [
                 {
                     'title': 'Failed at',
@@ -124,6 +134,8 @@ class SlackAlerter(Alerter):
             ]
             message_json['attachments'][0]['color'] = 'good'
             message_json['attachments'][0]['fields'] = fields
+            message_json['attachments'][0]['title'] = "Monitor {} succeeded.".format(name)
+            message_json['attachments'][0]['title_link'] = "https://rpm.newrelic.com/accounts/1259793/applications/16687249/transactions#id=5b225765625472616e73616374696f6e2f416374696f6e2f73657276696365732f696e6465782f6164756c742d736561726368222c22225d"
 
         else:
             print "Unknown alert type %s" % type
