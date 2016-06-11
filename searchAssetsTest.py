@@ -2,6 +2,11 @@
 
 import requests, json, random, string, time, sys
 
+try:
+    response_time_threshold = int(sys.argv[1])
+except IndexError:
+    response_time_threshold = 500  #default value of response_time_threshold
+
 url = "http://tvpapi.as.tvinci.com/v3_4/gateways/jsonpostgw.aspx"
 
 querystring = {"m":"SearchAssets"}
@@ -20,27 +25,28 @@ headers = {
 response = requests.request("POST", url, data=payload, headers=headers, params=querystring)
 #finish = int(time.time() * 1000000) / 1000
 response_time = int(response.elapsed.microseconds / 1000)
+print "response time threshold:%d ms" %(response_time_threshold)
 print "response time:%d ms" %(response_time)
-response_time_threshold = 500
+
 
 try: 
-	assert response.status_code == 200
-	print "HTTP status:%d" %(response.status_code)
+    assert response.status_code == 200
+    print "HTTP status:%d" %(response.status_code)
 
+    json_response = json.loads(response.text)
 
-	assert response_time < response_time_threshold, 'response time was:%d ms, should be < threshold:%d ms' %(response_time, response_time_threshold)
+    assert json_response['status']['code'] == 0, 'responsebody.status.code was: %d instead of %s' %(json_response['status']['code'], 0)
+    assert json_response['total_items'] >= 0, 'responsebody.total_items was: %d, expected >=0' %(json_response['total_items'])
 
-	json_response = json.loads(response.text)
+    print "total_items:%d" %(json_response['total_items'])
 
-	assert json_response['status']['code'] == 0, 'responsebody.status.code was: %d instead of %s' %(json_response['status']['code'], 0)
-	assert json_response['total_items'] >= 0, 'responsebody.total_items was: %d, expected >=0' %(json_response['total_items'])
+    assert json_response['assets'] is not None, 'response-body did not contain "assets" key'
 
-	print "total_items:%d" %(json_response['total_items'])
+    assert response_time < response_time_threshold, 'response time was:%d ms, should be < threshold:%d ms' %(response_time, response_time_threshold)
 
-	assert json_response['assets'] is not None, 'response-body did not contain "assets" key'
 except Exception, e:
-	error = str(e)
-	print "[FAIL] %s" %(error)
-	with open('/tmp/searchAssets.error', 'w') as f:
-		f.write(error)
-	sys.exit(1)
+    error = str(e)
+    print "[FAIL] %s" %(error)
+    # with open('/tmp/searchAssets.error', 'w') as f:
+    #     f.write(error)
+    sys.exit(1)
