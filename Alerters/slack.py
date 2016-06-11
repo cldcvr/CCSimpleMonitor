@@ -5,7 +5,8 @@ except:
     requests_available = False
 
 from alerter import Alerter
-
+from pytz import timezone
+import pytz
 
 class SlackAlerter(Alerter):
     """Send alerts to a Slack webhook."""
@@ -35,6 +36,10 @@ class SlackAlerter(Alerter):
     def send_alert(self, name, monitor):
         """Send the message."""
 
+        firstFailureTime = monitor.first_failure_time()
+        localized_firstFailureTime = pytz.utc.localize(firstFailureTime)
+        ist_converted_time = self.format_datetime(localized_firstFailureTime.astimezone(timezone('Asia/Kolkata')))
+
         type = self.should_alert(monitor)
         (days, hours, minutes, seconds) = self.get_downtime(monitor)
 
@@ -55,7 +60,7 @@ class SlackAlerter(Alerter):
             fields = [
                 {
                     'title': 'Failed at',
-                    'value': self.format_datetime(monitor.first_failure_time()),
+                    'value': ist_converted_time,
                     'short': True
                 },
                 {
@@ -99,7 +104,7 @@ class SlackAlerter(Alerter):
             fields = [
                 {
                     'title': 'Failed at',
-                    'value': self.format_datetime(monitor.first_failure_time()),
+                    'value': ist_converted_time,
                     'short': True
                 },
                 {
