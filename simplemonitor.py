@@ -3,6 +3,7 @@ import signal
 import copy
 import pickle
 import datetime
+import traceback
 
 import Monitors.monitor
 
@@ -197,6 +198,8 @@ class SimpleMonitor:
                 alerter.send_alert(key, self.monitors[key])
             except Exception, e:
                 print "exception caught while alerting for %s: %s" % (key, e)
+                traceback.print_exc()
+
         for key in self.remote_monitors.keys():
             try:
                 if self.remote_monitors[key].remote_alerting:
@@ -207,6 +210,7 @@ class SimpleMonitor:
                     continue
             except Exception, e:
                 print "exception caught while alerting for %s: %s" % (key, e)
+                traceback.print_exc()
 
     def count_monitors(self):
         """Gets the number of monitors we have defined."""
