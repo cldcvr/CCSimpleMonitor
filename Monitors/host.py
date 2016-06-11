@@ -504,6 +504,7 @@ class MonitorCommand(Monitor):
                     self.record_fail("%s >= %s" % (outasinteger, self.result_max))
                     return True
         except Exception, e:
+            print 'EXCEPTION!'
             self.record_fail(e)
             return False
 
