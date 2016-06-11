@@ -467,12 +467,16 @@ class MonitorCommand(Monitor):
         self.result_regexp_text = ""
         self.result_regexp = None
         self.result_max = None
+        self.description = None
+        self.command_output = ""
 
         if 'result_regexp' in config_options:
             self.result_regexp_text = config_options["result_regexp"]
             self.result_regexp = re.compile(self.result_regexp_text)
         elif 'result_max' in config_options:
             self.result_max = int(config_options["result_max"])
+        elif 'description' in config_options:
+            self.description = config_options['description']
         else:
             raise RuntimeError("Required configuration fields missing")
 
@@ -486,7 +490,9 @@ class MonitorCommand(Monitor):
 
     def run_test(self):
         try:
-            out = subprocess.check_output(self.command)
+            self.command_output = subprocess.check_output(self.command)
+            out = self.command_output
+
             if self.result_regexp is not None:
                 matches = self.result_regexp.search(out)
                 if matches:
@@ -503,8 +509,16 @@ class MonitorCommand(Monitor):
                 else:
                     self.record_fail("%s >= %s" % (outasinteger, self.result_max))
                     return True
+            elif self.description == 'True':
+                self.record_success()
+                return True
+        except subprocess.CalledProcessError, e:
+            #print 'CalledProcessError: %s' %(str(e.output))
+            self.command_output = str(e.output)
+            self.record_fail(e)
+            return False
         except Exception, e:
-            print 'EXCEPTION!'
+            #print 'General Exception!'
             self.record_fail(e)
             return False
 
@@ -514,9 +528,11 @@ class MonitorCommand(Monitor):
     def describe(self):
         """Explains what this instance is checking"""
         if self.result_regexp is not None:
-            return "checking a command %s match a regexp %s" % (" ".join(self.command), self.result_regexp_text)
+            return "checking a command '%s' match a regexp '%s'" % (" ".join(self.command), self.result_regexp_text)
+        elif self.description == 'True':
+            return "%s" %("".join(self.command_output))
         else:
-            return "checking a command %s returns a value < %d" % (" ".join(self.command), self.result_max)
+            return "checking a command '%s' returns a value < '%d'" % (" ".join(self.command), self.result_max)
 
     def get_params(self):
         return (self.command, self.result_regexp_text)
