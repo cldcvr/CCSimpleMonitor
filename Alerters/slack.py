@@ -55,7 +55,7 @@ class SlackAlerter(Alerter):
             localized_firstFailureTime = pytz.utc.localize(firstFailureTime)
             ist_converted_time = self.format_datetime(localized_firstFailureTime.astimezone(timezone('Asia/Kolkata')))
 
-            message_json['text'] = "API test run completed."
+            message_json['text'] = "CCSimpleMonitor API test run completed."
 
             message_json['username'] = "V18SimpleMonitor"
             message_json["icon_url"] = "http://i.imgur.com/XdABB5Z.png"
@@ -110,8 +110,8 @@ class SlackAlerter(Alerter):
             firstFailureTime = monitor.first_failure_time()
             localized_firstFailureTime = pytz.utc.localize(firstFailureTime)
             ist_converted_time = self.format_datetime(localized_firstFailureTime.astimezone(timezone('Asia/Kolkata')))
-            
-            message_json['text'] = "API test run completed."
+
+            message_json['text'] = "CCSimpleMonitor API test run completed."
 
             message_json['username'] = "V18SimpleMonitor"
             message_json["icon_url"] = "http://i.imgur.com/XdABB5Z.png"
