@@ -1,2 +1,5 @@
 requests>=2.10.0
 pytz
+pyopenssl
+ndg-httpsclient
+pyasn1
